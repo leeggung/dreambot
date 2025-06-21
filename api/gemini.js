@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const userMessage = req.body?.message || "";
 
     let promptFile = "/prompt.txt";
-   console.log('💡 로드된 프롬프트:', prompt);
+    console.log('💡 로드된 프롬프트:', prompt);
      const promptPath = path.join(process.cwd(), promptFile);
     const prompt = fs.readFileSync(promptPath, "utf8");
 
