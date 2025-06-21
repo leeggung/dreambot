@@ -9,9 +9,9 @@ export default async function handler(req, res) {
     const type = req.body?.type || "general";
     const userMessage = req.body?.message || "";
 
-    let promptFile = "public/prompt.txt";
-   
-    const promptPath = path.join(process.cwd(), promptFile);
+    let promptFile = "/prompt.txt";
+   console.log('💡 로드된 프롬프트:', prompt);
+     const promptPath = path.join(process.cwd(), promptFile);
     const prompt = fs.readFileSync(promptPath, "utf8");
 
     const fullPrompt = `${prompt.trim()}\n\n${userMessage.trim()}`;
