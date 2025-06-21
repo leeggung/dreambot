@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("user-input");
