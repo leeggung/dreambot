@@ -140,14 +140,29 @@ ${languageNotice}`;
     try {
       const staticPrompt = await fetch("/prompt.txt").then(res => res.text());
 
+      let productInfoBlock = "";
+      if (matchedProducts.length > 0) {
+        productInfoBlock = matchedProducts.map((p, i) => {
+          return `${i + 1}. ${p["제품명"] || "상품명 없음"}
+태그: ${p["태그"] || "정보 없음"}
+`;
+        }).join("
+");
+      }
+
       const fullPrompt = `
 ${staticPrompt.trim()}
 
 ---
-현재 사용자의 질문과 추천 정보:
-${promptText.trim()}
+💬 사용자 질문: ${userMsg.trim()}
 
-→ 위 정보를 참고해서 친절하게 응답해줘. 반복적인 인사말은 하지 않아도 되고, 카드 내용에 어울리는 성분 중심 설명을 부탁해.
+🎯 추천 제품 목록:
+${productInfoBlock}
+
+→ 위 제품들에 대해 성분 또는 효능을 인터넷에서 참고하여 간단히 요약해줘.
+→ 제품명은 반드시 그대로 말하고, 가격/PV/링크는 말하지 마.
+→ 너무 길게 말하지 말고 카드에 어울리는 간결한 답변을 해줘.
+→ 인사말은 생략해도 좋아.
 `.trim();
 
       const res = await fetch("/api/gemini", {
@@ -158,6 +173,11 @@ ${promptText.trim()}
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "응답이 없어요.";
       addMessage("bot", reply);
+
+      // 카드 렌더링은 제미니 응답 후에 실행
+      if (intent === "product" && matchedProducts.length > 0) {
+        matchedProducts.forEach(p => renderProductCard(p));
+      }
     } catch (e) {
       addMessage("bot", "❌ 오류 발생: " + e.message);
     }
