@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
        return `${i + 1}. ${p["제품명"] || "상품명 없음"}\n태그: ${p["태그"] || "정보 없음"}\n`;
         }).join("\n");
 
-        promptText = \`
+        promptText =()
 💬 사용자 질문: ${userMsg}
 
 👉 아래는 추천된 제품입니다:
