@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>드림봇 채팅</title>
+  <style>
+    body { font-family: sans-serif; background: #fff; margin: 0; padding: 20px; }
+    #chat-box { height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    .user-msg, .bot-msg { margin: 5px 0; padding: 8px 10px; border-radius: 8px; max-width: 80%; }
+    .user-msg { background: #d4f8c4; text-align: right; margin-left: auto; }
+    .bot-msg { background: #eee; }
+    #user-input { width: 80%; height: 60px; }
+  </style>
+</head>
+<body>
+  <h2>드림봇 채팅</h2>
+  <div id="chat-box"></div>
+  <footer>
+    <input type="text" id="user-input" placeholder="메시지를 입력하세요..." />
+    <button id="send-button">전송</button>
+  </footer>
+  <script src="chat.js"></script>
+</body>
+</html>

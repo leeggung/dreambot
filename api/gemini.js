@@ -1,0 +1,34 @@
+
+import fs from "fs";
+import path from "path";
+
+export default async function handler(req, res) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  const model = "gemini-2.0-flash";
+
+  try {
+    const promptPath = path.join(process.cwd(), "public", "prompt.txt");
+    const prompt = fs.readFileSync(promptPath, "utf8");
+    const userMessage = req.body?.message || "";
+
+    const fullPrompt = `${prompt.trim()}
+
+사용자 질문: ${userMessage.trim()}`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPrompt }] }]
+        }),
+      }
+    );
+
+    const result = await response.json();
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}

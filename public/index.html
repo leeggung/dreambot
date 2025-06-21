@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>안산 감동드림봇</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background: #fff; color: #222; }
+    header { text-align: center; padding: 24px 16px; background: #f4f4f4; }
+    .avatar { width: 100px; border-radius: 50%; margin-bottom: 8px; }
+    .search-box { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 16px; }
+    .search-box input { flex: 1; padding: 12px; font-size: 16px; }
+    .search-box button { padding: 12px 16px; font-size: 16px; cursor: pointer; }
+    .how-to-use, .card-slider { padding: 16px; }
+    .how-to-use ul { padding-left: 20px; }
+    .slide-container { display: flex; overflow-x: auto; gap: 12px; }
+    .slide-card { min-width: 200px; border: 1px solid #ccc; border-radius: 12px; padding: 12px; background: #fafafa; flex-shrink: 0; }
+    .slide-card img { width: 100%; border-radius: 8px; }
+    footer { text-align: center; font-size: 13px; color: #aaa; padding: 16px; margin-top: 24px; border-top: 1px solid #eee; }
+  </style>
+</head>
+<body>
+
+  <header class="top-header">
+    <img src="jwai.png" alt="지웅이" class="avatar" />
+    <h1>안산 감동드림봇</h1>
+    <p>드림이에게 질문하고 맡겨주세요</p>
+  </header>
+
+  <section class="search-box">
+    <input type="text" placeholder="AI에게 질문하세요..." />
+    <button onclick="location.href='chat.html'">🔍</button>
+  </section>
+
+  <section class="how-to-use">
+    <h2>앱 사용 방법</h2>
+    <ul>
+      <li>✔ 가입 후 질문을 시작하세요.</li>
+      <li>✔ 궁금한 내용을 자유롭게 물어보세요.</li>
+      <li>✔ Gemini가 도움을 드립니다.</li>
+    </ul>
+  </section>
+
+  <section class="card-slider">
+    <h2>무엇을 도와드릴까요?</h2>
+    <div class="slide-container">
+      <div class="slide-card" onclick="location.href='chat.html'">
+        <img src="img_product.png" />
+        <h3>상품 추천 보기</h3>
+        <p>피로회복, 눈 건강, 면역력 등 상황별 추천</p>
+      </div>
+      <div class="slide-card" onclick="location.href='chat.html'">
+        <img src="img_join.png" />
+        <h3>회원가입 안내</h3>
+        <p>추천인 제도 및 서류 안내</p>
+      </div>
+      <div class="slide-card" onclick="location.href='chat.html'">
+        <img src="img_structure.png" />
+        <h3>후원인 구조 설명</h3>
+        <p>바이너리, 무한적립, 상한제 구조</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>CREATOR: JW.CC &nbsp; VER 1.0</p>
+  </footer>
+
+</body>
+</html>
