@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderProductCard(product) {
-    addMessage("bot", \`
+    addMessage("bot", `
       <div style="border:1px solid #ccc; padding:10px; border-radius:10px; margin:10px 0; background:#f9f9f9">
         <b>👁️ 눈 건강 추천 제품</b><br><br>
         <img src="\${product.썸네일 || ''}" style="width:100px;height:auto;margin-bottom:5px;"><br>
