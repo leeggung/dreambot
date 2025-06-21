@@ -72,9 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (intent === "product") {
       matchedProducts = matchProduct(userMsg, products);
       if (matchedProducts.length > 0) {
-        const contextInfo = matchedProducts.map((p, i) => {
-          return \`${i + 1}. ${p["제품명"] || "상품명 없음"}\n태그: ${p["태그"] || "정보 없음"}\n\`;
+       const contextInfo = matchedProducts.map((p, i) => {
+       return `${i + 1}. ${p["제품명"] || "상품명 없음"}\n태그: ${p["태그"] || "정보 없음"}\n`;
         }).join("\n");
+
         promptText = \`
 💬 사용자 질문: ${userMsg}
 
@@ -124,4 +125,3 @@ ${contextInfo}
     }
   });
 });
-
