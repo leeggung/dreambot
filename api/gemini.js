@@ -10,9 +10,7 @@ export default async function handler(req, res) {
     const userMessage = req.body?.message || "";
 
     let promptFile = "public/prompt.txt";
-    if (type === "product") promptFile = "public/QA_product_prompt.txt";
-    else if (type === "business") promptFile = "public/QA_business.txt";
-
+   
     const promptPath = path.join(process.cwd(), promptFile);
     const prompt = fs.readFileSync(promptPath, "utf8");
 
