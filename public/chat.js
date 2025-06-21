@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("user-input");
   const sendBtn = document.getElementById("send-button");
@@ -34,42 +35,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderProductCard(product) {
-    addMessage("bot", `
+    addMessage("bot", \`
       <div style="border:1px solid #ccc; padding:10px; border-radius:10px; margin:10px 0; background:#f9f9f9">
         <b>👁️ 눈 건강 추천 제품</b><br><br>
-        <img src="${product.썸네일 || ''}" style="width:100px;height:auto;margin-bottom:5px;"><br>
-        <b>${product.제품명 || '상품명 없음'}</b><br>
-        <span>${product.태그 || ''}</span><br>
-        <span>${product.가격 || ''} / ${product.pv || ''}</span><br>
-        <a href="${product.링크 || '#'}" target="_blank">상세 보기</a>
+        <img src="\${product.썸네일 || ''}" style="width:100px;height:auto;margin-bottom:5px;"><br>
+        <b>\${product.제품명 || '상품명 없음'}</b><br>
+        <span>\${product.태그 || ''}</span><br>
+        <span>\${product.가격 || ''} / \${product.pv || ''}</span><br>
+        <a href="\${product.링크 || '#'}" target="_blank">상세 보기</a>
       </div>
-    `, true);
-  }
-
-  function renderBusinessCards(cards) {
-    cards.forEach(card => {
-      addMessage("bot", `
-        <div style="border:1px solid #ccc; padding:10px; border-radius:10px; background:#f9f9f9">
-          <b>📌 ${card.title}</b><br><br>
-          <img src="${card.image}" style="width:100px;height:auto;margin-bottom:5px;"><br>
-          ${card.description}<br>
-          <a href="${card.link}" target="_blank">자세히 보기</a>
-        </div>
-      `, true);
-    });
-  }
-
-  function matchBusinessCards(userMsg, cards) {
-    const lower = userMsg.toLowerCase();
-    return cards.filter(c =>
-      lower.includes("회원가입") && c.title.includes("회원가입") ||
-      lower.includes("질문") && c.title.includes("자주하는")
-    );
+    \`, true);
   }
 
   function analyzeIntent(text) {
     const safe = (text || "").toLowerCase();
-    const productKeywords = ["제품", "성분", "건강", "효과", "피부", "눈", "면역", "보습", "영양"];
+    const productKeywords = ["제품", "성분", "건강", "효과", "피부", "눈", "면역", "보습", "영양", "추천"];
     const businessKeywords = ["회원가입", "가입", "수당", "구조", "혜택", "수입", "포인트", "직급", "마케팅", "사업", "후원"];
     const matchedProduct = productKeywords.some(k => safe.includes(k));
     const matchedBusiness = businessKeywords.some(k => safe.includes(k));
@@ -77,21 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (matchedProduct) return "product";
     return "general";
   }
-
-  const businessCards = [
-    {
-      title: "자주하는 질문",
-      description: "애터미 관련 자주 묻는 질문을 확인해보세요.",
-      image: "https://postfiles.pstatic.net/MjAyNTA1MTVfMTE3/MDAxNzQ3MjkzMjk5MjM2.L0CfnKh8_xFS_xv33Rq2c14uUaDaKUxZXg4K6lGq-ecg.DbDxWRbA9_l9kenGBn-bgaCfbV5wExVnLwOIAAqCqbQg.PNG",
-      link: "https://blog.naver.com/leehyku/223851031151"
-    },
-    {
-      title: "회원가입 안내",
-      description: "애터미 회원가입 방법을 확인하세요.",
-      image: "https://postfiles.pstatic.net/MjAyNTA1MDhfNDAg/MDAxNzQ2NjkwNTA5NzAy.83qYxNFWgB6Vl3SGGgdlgjaWPxeVBW8D1NmkWRy0ic4g.cNpjp46aJxfVW4ssemgzsgSANmMr-38QBdQurszo34Ig.PNG",
-      link: "https://blog.naver.com/leehyku/223859216766"
-    }
-  ];
 
   async function handleUserInput() {
     const userMsg = input.value.trim();
@@ -104,84 +69,51 @@ document.addEventListener("DOMContentLoaded", () => {
     let promptText = "";
     let matchedProducts = [];
 
-    if (intent === "business") {
-      const matched = matchBusinessCards(userMsg, businessCards);
-      renderBusinessCards(matched);
-      promptText = `현재 대화 주제: 사업 안내
-추천 카드: ${matched.map(c => c.title).join(", ")}
-사용자 질문: ${userMsg}`;
-    } else if (intent === "product") {
+    if (intent === "product") {
       matchedProducts = matchProduct(userMsg, products);
       if (matchedProducts.length > 0) {
-        matchedProducts.forEach(p => renderProductCard(p));
-        const contextInfo = `추천 제품: ${matchedProducts.map(p => `${p["제품명"]} (${p["가격"]} / ${p["pv"]})`).join(", ")}`;
-        promptText = `현재 대화 주제: 상품 추천
-${contextInfo}
-사용자 질문: ${userMsg}
-→ 위 제품들의 기능이나 성분을 핵심만 간단히 요약해줘. 너무 길게 쓰지 말고 카드용 응답처럼 답변해줘.`;
+        const contextInfo = matchedProducts.map((p, i) => {
+          return \`\${i + 1}. \${p["제품명"] || "상품명 없음"}\n태그: \${p["태그"] || "정보 없음"}\n\`;
+        }).join("\n");
+        promptText = \`
+💬 사용자 질문: \${userMsg}
+
+👉 아래는 추천된 제품입니다:
+\${contextInfo}
+→ 해당 제품들의 성분과 효능을 인터넷에서 참고해서 간단히 요약해줘.
+→ 제품명은 반드시 그대로 말하고, 가격/PV/링크는 말하지 마.
+→ 카드에 어울리는 간결한 설명으로 답해줘.
+        \`.trim();
       } else {
-        promptText = `사용자 질문: ${userMsg}
-관련된 제품이 없습니다.`;
+        promptText = \`사용자 질문: \${userMsg}\n→ 관련된 제품이 없습니다.\`;
       }
+    } else if (intent === "business") {
+      promptText = \`
+사용자 질문: \${userMsg}
+→ 아래는 애터미 사업 관련 질문입니다. QA 데이터베이스에 기반해 설명해줘.
+→ 너무 짧지 않게, 누구나 이해할 수 있게 말해줘.
+→ 상품 홍보보다 구조 설명 중심으로 해줘.
+      \`.trim();
     } else {
-      promptText = `사용자 질문: ${userMsg}`;
+      promptText = \`사용자 질문: \${userMsg}\n→ 친절하고 명확하게 설명해줘.\`;
     }
 
-    const languageNotice = "※ 현재는 한국어 기준입니다. 해외 사용자는 지역 사이트 또는 글로벌 애터미 사이트를 참조하세요.";
-    promptText += `
-
-${languageNotice}`;
-
-    const payload = {
-      contents: [{ role: "user", parts: [{ text: promptText }] }]
-    };
-
-    
     try {
-      const staticPrompt = await fetch("/prompt.txt").then(res => res.text());
-
-      let productInfoBlock = "";
-      if (matchedProducts.length > 0) {
-        productInfoBlock = matchedProducts.map((p, i) => {
-          return `${i + 1}. ${p["제품명"] || "상품명 없음"}
-태그: ${p["태그"] || "정보 없음"}
-`;
-        }).join("
-");
-      }
-
-      const fullPrompt = `
-${staticPrompt.trim()}
-
----
-💬 사용자 질문: ${userMsg.trim()}
-
-🎯 추천 제품 목록:
-${productInfoBlock}
-
-→ 위 제품들에 대해 성분 또는 효능을 인터넷에서 참고하여 간단히 요약해줘.
-→ 제품명은 반드시 그대로 말하고, 가격/PV/링크는 말하지 마.
-→ 너무 길게 말하지 말고 카드에 어울리는 간결한 답변을 해줘.
-→ 인사말은 생략해도 좋아.
-`.trim();
-
       const res = await fetch("/api/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: fullPrompt })
+        body: JSON.stringify({ type: intent, message: promptText })
       });
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "응답이 없어요.";
       addMessage("bot", reply);
 
-      // 카드 렌더링은 제미니 응답 후에 실행
       if (intent === "product" && matchedProducts.length > 0) {
         matchedProducts.forEach(p => renderProductCard(p));
       }
     } catch (e) {
       addMessage("bot", "❌ 오류 발생: " + e.message);
     }
-
   }
 
   sendBtn.addEventListener("click", handleUserInput);
@@ -192,4 +124,3 @@ ${productInfoBlock}
     }
   });
 });
-
