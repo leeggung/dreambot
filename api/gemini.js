@@ -9,10 +9,10 @@ export default async function handler(req, res) {
     const type = req.body?.type || "general";
     const userMessage = req.body?.message || "";
 
-    let promptFile = "/prompt.txt";
-    console.log('💡 로드된 프롬프트:', prompt);
-     const promptPath = path.join(process.cwd(), promptFile);
+    const promptFile = "/prompt.txt";
+    const promptPath = path.join(process.cwd(), promptFile);
     const prompt = fs.readFileSync(promptPath, "utf8");
+    console.log('💡 로드된 프롬프트:', prompt);
 
     const fullPrompt = `${prompt.trim()}\n\n${userMessage.trim()}`;
 
@@ -22,14 +22,22 @@ export default async function handler(req, res) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: fullPrompt }] }]
+          prompt: { text: fullPrompt },
+          // 혹시 options 등 추가 필요하면 넣기
         }),
       }
     );
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API 호출 실패:', errorText);
+      return res.status(response.status).json({ error: errorText });
+    }
+
     const result = await response.json();
     res.status(200).json(result);
   } catch (error) {
+    console.error('서버 에러:', error);
     res.status(500).json({ error: error.message });
   }
 }
