@@ -1,4 +1,3 @@
-
 import fs from "fs";
 import path from "path";
 
@@ -7,13 +6,17 @@ export default async function handler(req, res) {
   const model = "gemini-2.0-flash";
 
   try {
-    const promptPath = path.join(process.cwd(), "public", "prompt.txt");
-    const prompt = fs.readFileSync(promptPath, "utf8");
+    const type = req.body?.type || "general";
     const userMessage = req.body?.message || "";
 
-    const fullPrompt = `${prompt.trim()}
+    let promptFile = "public/prompt.txt";
+    if (type === "product") promptFile = "public/QA_product_prompt.txt";
+    else if (type === "business") promptFile = "public/QA_business.txt";
 
-사용자 질문: ${userMessage.trim()}`;
+    const promptPath = path.join(process.cwd(), promptFile);
+    const prompt = fs.readFileSync(promptPath, "utf8");
+
+    const fullPrompt = `${prompt.trim()}\n\n${userMessage.trim()}`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
