@@ -136,11 +136,24 @@ ${languageNotice}`;
       contents: [{ role: "user", parts: [{ text: promptText }] }]
     };
 
+    
     try {
+      const staticPrompt = await fetch("/prompt.txt").then(res => res.text());
+
+      const fullPrompt = `
+${staticPrompt.trim()}
+
+---
+현재 사용자의 질문과 추천 정보:
+${promptText.trim()}
+
+→ 위 정보를 참고해서 친절하게 응답해줘. 반복적인 인사말은 하지 않아도 되고, 카드 내용에 어울리는 성분 중심 설명을 부탁해.
+`.trim();
+
       const res = await fetch("/api/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ message: fullPrompt })
       });
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "응답이 없어요.";
@@ -148,6 +161,7 @@ ${languageNotice}`;
     } catch (e) {
       addMessage("bot", "❌ 오류 발생: " + e.message);
     }
+
   }
 
   sendBtn.addEventListener("click", handleUserInput);
@@ -158,3 +172,4 @@ ${languageNotice}`;
     }
   });
 });
+
