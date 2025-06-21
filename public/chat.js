@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span>${product.가격 || ''} / ${product.pv || ''}</span><br>
         <a href="${product.링크 || '#'}" target="_blank">상세 보기</a>
       </div>
-    \`, true);
+    `, true);
   }
 
   function analyzeIntent(text) {
@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
        return `${i + 1}. ${p["제품명"] || "상품명 없음"}\n태그: ${p["태그"] || "정보 없음"}\n`;
         }).join("\n");
 
-        promptText =()
+        promptText = `
 💬 사용자 질문: ${userMsg}
 
 👉 아래는 추천된 제품입니다:
@@ -84,19 +84,19 @@ ${contextInfo}
 → 해당 제품들의 성분과 효능을 인터넷에서 참고해서 간단히 요약해줘.
 → 제품명은 반드시 그대로 말하고, 가격/PV/링크는 말하지 마.
 → 카드에 어울리는 간결한 설명으로 답해줘.
-        \`.trim();
+        `.trim();
       } else {
-        promptText = \`사용자 질문: ${userMsg}\n→ 관련된 제품이 없습니다.\`;
+        promptText = `사용자 질문: ${userMsg}\n→ 관련된 제품이 없습니다.`;
       }
     } else if (intent === "business") {
-      promptText = \`
+      promptText = `
 사용자 질문: ${userMsg}
 → 아래는 애터미 사업 관련 질문입니다. QA 데이터베이스에 기반해 설명해줘.
 → 너무 짧지 않게, 누구나 이해할 수 있게 말해줘.
 → 상품 홍보보다 구조 설명 중심으로 해줘.
-      \`.trim();
+      `.trim();
     } else {
-      promptText = \`사용자 질문: ${userMsg}\n→ 친절하고 명확하게 설명해줘.\`;
+      promptText = `사용자 질문: ${userMsg}\n→ 친절하고 명확하게 설명해줘.`;
     }
 
     try {
