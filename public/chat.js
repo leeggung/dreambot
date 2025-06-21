@@ -103,7 +103,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "응답이 없어요.";
-      addMessage("bot", reply);
+      
+    // Gemini 응답으로부터 제품 매칭 시도
+    const productMatches = matchProduct(reply, products);
+    if (productMatches.length > 0) {
+      productMatches.slice(0, 3).forEach(p => renderProductCard(p));
+      return;
+    }
+
+    // Gemini 응답으로부터 QA 매칭 시도
+    const qaMatches = matchQA(reply, qa);
+    if (qaMatches.length > 0) {
+      renderQACard(qaMatches[0].answer);
+      return;
+    }
+
+    // 아무 것도 매칭되지 않으면 기본 응답 출력
+    addMessage("bot", reply);
+    
     } catch (e) {
       addMessage("bot", "❌ 오류 발생: " + e.message);
     }
