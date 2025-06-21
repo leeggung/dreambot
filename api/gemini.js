@@ -6,38 +6,40 @@ export default async function handler(req, res) {
   const model = "gemini-2.0-flash";
 
   try {
-    const type = req.body?.type || "general";
     const userMessage = req.body?.message || "";
 
-    const promptFile = "/prompt.txt";
-    const promptPath = path.join(process.cwd(), promptFile);
-    const prompt = fs.readFileSync(promptPath, "utf8");
-    console.log('💡 로드된 프롬프트:', prompt);
+    // 역할별 프롬프트 불러오기
+    const baseDir = process.cwd();
+    const companyPrompt = fs.readFileSync(path.join(baseDir, "/company_prompt.txt"), "utf8");
+    const productPrompt = fs.readFileSync(path.join(baseDir, "/product_prompt.txt"), "utf8");
 
-    const fullPrompt = `${prompt.trim()}\n\n${userMessage.trim()}`;
+    // 메시지 배열로 역할 분리해서 전달
+    const messages = [
+      { role: "system", content: companyPrompt },
+      { role: "system", content: productPrompt },
+      { role: "user", content: userMessage }
+    ];
 
+    // API 호출
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: { text: fullPrompt },
-          // 혹시 options 등 추가 필요하면 넣기
-        }),
+        body: JSON.stringify({ messages }), // 메시지 배열 그대로 보냄
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API 호출 실패:', errorText);
+      console.error("API 호출 실패:", errorText);
       return res.status(response.status).json({ error: errorText });
     }
 
     const result = await response.json();
     res.status(200).json(result);
   } catch (error) {
-    console.error('서버 에러:', error);
+    console.error("서버 에러:", error);
     res.status(500).json({ error: error.message });
   }
 }
