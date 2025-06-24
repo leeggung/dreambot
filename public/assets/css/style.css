@@ -1,0 +1,252 @@
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f1f1f1;
+}
+
+.chat-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: #0078d4;
+  color: white;
+  padding: 1em;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+main {
+  font-size: 18px;
+  flex-grow: 1;
+  padding: 1em;
+  overflow-y: auto;
+}
+
+footer {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  background: #fafafa;
+}
+
+input#user-input {
+  height: 50px;
+  font-size: 20px;
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button#send-button {
+  padding: 10px 20px;
+  margin-left: 10px;
+  background: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.chat-message {
+  display: flex;
+  margin: 10px;
+  align-items: flex-end;
+}
+
+.user-message, .bot-message {
+  padding: 10px;
+  border-radius: 15px;
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+.user-message {
+  background: #f6c542;
+  margin-left: auto;
+  text-align: right;
+  border-bottom-right-radius: 0;
+}
+
+.bot-message {
+  background: #d0e7ff;
+  margin-right: auto;
+  text-align: left;
+  border-bottom-left-radius: 0;
+}
+
+.chat-message img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin: 0 10px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  background: #fff;
+  font-size: 0.95em;
+}
+
+@media screen and (max-width: 600px) {
+  input#user-input {
+    font-size: 18px;
+    height: 48px;
+  }
+
+  button#send-button {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  main {
+    font-size: 16px;
+  }
+}
+
+
+
+/* 카카오톡 스타일 말풍선 */
+.chat-message {
+  display: flex;
+  margin: 10px;
+  align-items: flex-end;
+}
+
+.chat-message.bot {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.chat-message.user {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.chat-message.bot .chat-bubble {
+  background-color: #e1f0ff;
+  border-top-left-radius: 0;
+}
+
+.chat-message.user .chat-bubble {
+  background-color: #fffacc;
+  border-top-right-radius: 0;
+}
+
+.chat-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 8px;
+  border-radius: 50%;
+}
+
+
+
+/* 카카오톡 스타일 말풍선 UI */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.chat-left, .chat-right {
+  display: flex;
+  flex-direction: column;
+  max-width: 75%;
+}
+
+.chat-left {
+  align-self: flex-start;
+}
+
+.chat-right {
+  align-self: flex-end;
+}
+
+.bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 15px;
+  word-break: break-word;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.chat-left .bubble {
+  background-color: #f0f0f0;
+  border-top-left-radius: 0;
+}
+
+.chat-right .bubble {
+  background-color: #d0f0ff;
+  border-top-right-radius: 0;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .bubble {
+    font-size: 14px;
+  }
+  .chat-container {
+    padding: 8px;
+  }
+}
+
+
+
+/* 카드 전용 영역 */
+.card-wrapper {
+  margin-top: 4px;
+  max-width: 75%;
+  align-self: flex-end;
+}
+
+.card-wrapper .bubble {
+  background-color: #e6f7ff;
+  border: 1px solid #d0f0ff;
+}
+
+
+
+/* 프로필 이미지 스타일 */
+.profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
+.chat-left, .chat-right {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.chat-left .bubble, .chat-right .bubble {
+  margin: 0;
+}

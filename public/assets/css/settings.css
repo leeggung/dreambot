@@ -1,0 +1,116 @@
+/* /assets/css/settings.css */
+
+/* -------------------- 설정 패널 (흰색 바텀시트) -------------------- */
+.settings-panel {
+  position: fixed;
+  bottom: 0; /* 화면 하단에 기준 위치 고정 */
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 1rem;
+  z-index: 9999; /* 가장 위에 오도록 매우 높게 설정 */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(100%); /* 초기에는 자신의 높이만큼 아래로 이동하여 숨김 */
+  transition: transform 0.3s ease; /* 슬라이드 애니메이션 */
+  max-height: calc(100vh - 60px); /* 뷰포트 높이에서 상단에 충분한 공간 확보 (임의로 60px) */
+  overflow-y: auto; /* 내용이 많으면 스크롤 가능 */
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+  color: #333; /* 설정 패널 텍스트 색상 */
+  display: flex; /* 내부 요소 정렬을 위해 추가 */
+  flex-direction: column; /* 세로 정렬 */
+  align-items: center; /* 가로 중앙 정렬 */
+}
+
+/* settings-panel이 나타날 때 */
+.settings-panel.show {
+  transform: translateY(0); /* 'show' 클래스 적용 시 화면에 나타남 */
+}
+
+/* -------------------- 설정 패널 내부 요소 -------------------- */
+.settings-panel h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+    width: 100%; /* 부모에 맞춰 너비 */
+}
+.setting-option {
+    margin-bottom: 20px;
+    width: 100%; /* 너비 100%로 설정하여 내부 요소들이 잘 정렬되도록 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 내부 요소 중앙 정렬 */
+}
+.setting-option h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #555;
+    text-align: center; /* 제목 중앙 정렬 */
+    width: 100%;
+}
+.settings-panel button {
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    margin-top: 15px; /* 상단 여백 유지 */
+    width: auto; /* 버튼 너비 자동 */
+    min-width: 80px; /* 최소 너비 설정 */
+}
+.settings-panel button:hover {
+    background: #ddd;
+}
+#close-settings-button { /* 닫기 버튼은 중앙에 */
+    display: block;
+    margin: 20px auto 0;
+    background: #fbbd72;
+    color: black;
+    border: none;
+    padding: 12px 24px; /* 닫기 버튼 크기 키우기 */
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px; /* 닫기 버튼 모서리 둥글게 */
+    width: 80%; /* 너비 80%로 설정 */
+    max-width: 300px; /* 최대 너비 제한 */
+}
+
+.font-size-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%; /* 부모에 맞춰 너비 100% */
+    justify-content: center; /* 버튼들 중앙 정렬 */
+    padding: 0 1rem; /* 좌우 패딩 추가 */
+    box-sizing: border-box;
+}
+.font-size-buttons button {
+  padding: 8px 15px; /* 패딩 증가 */
+  flex: 1; /* 버튼들이 가로로 균등하게 공간 차지 */
+  max-width: 120px; /* 최대 너비 */
+}
+
+/* 채팅 배경 이미지 옵션 */
+.bg-options {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    justify-content: center; /* 이미지들 중앙 정렬 */
+    flex-wrap: wrap; /* 이미지가 많으면 다음 줄로 */
+    width: 100%;
+}
+.bg-options img {
+    width: 120px; /* 이미지 너비 키우기 */
+    height: 80px; /* 높이도 비율에 맞춰 키우기 */
+    object-fit: cover; /* 이미지가 잘리지 않고 채워지도록 */
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.bg-options img:hover {
+    border-color: #90e0b4;
+}

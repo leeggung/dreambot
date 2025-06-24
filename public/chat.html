@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎩 드림이 채팅</title>
+  <link rel="stylesheet" href="/assets/css/chat.css" />
+  <link rel="stylesheet" href="/assets/css/settings.css" />
+  <style>
+    /* 전역적인 기본 스타일 */
+    body {
+      margin: 0;
+      background-color: #111; /* 기본 배경색 */
+      color: white;
+      font-family: 'Noto Sans KR', sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden; /* 전체 스크롤 방지, chat-box에서 스크롤 처리 */
+      background-size: cover; /* 배경 이미지 적용을 위해 */
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    :root {
+      --chat-font-size: 1.1rem; /* CSS 변수 정의 */
+      --settings-panel-height: 40vh; /* 설정 패널 높이 기본값 (JS에서 동적으로 변경될 수 있음) */
+      --bottom-nav-height: 60px; /* 하단 내비게이션 바 높이 */
+      --input-area-height: 60px; /* 입력 영역 높이 (padding 포함) */
+      --total-fixed-height: calc(var(--bottom-nav-height) + var(--input-area-height));
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div id="chat-box" class="chat-box">
+      <div class="message bot">
+        <img src="/assets/images/dreami.png" class="avatar" alt="드림이" />
+        <div class="bubble">안녕하세요! 무엇이든 물어보세요 :)</div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <textarea id="userInput" placeholder="메시지를 입력하세요..."></textarea>
+      <button id="send-button">전송</button>
+    </div>
+  </div>
+
+  <div class="bottom-nav" id="mainBottomNav">
+    <div class="menu-slider">
+      <div class="menu-item">🏠 홈</div>
+      <div class="menu-item">📢 공지</div>
+      <div class="menu-item">💬 상담</div>
+      <div class="menu-item" id="settings-menu-item">⚙️설정</div>
+    </div>
+  </div>
+
+  <div id="settings-panel" class="settings-panel">
+    <h3>환경 설정</h3>
+    <div class="setting-option">
+      <h4>채팅 배경</h4>
+      <div class="bg-options">
+        <img src="/assets/images/bg_custom1.jpg" data-bg-url="/assets/images/bg_custom1.jpg" alt="배경1" />
+        <img src="/assets/images/bg_custom2.jpg" data-bg-url="/assets/images/bg_custom2.jpg" alt="배경2" />
+		<img src="/assets/images/bg_custom3.jpg" data-bg-url="/assets/images/bg_custom3.jpg" alt="배경3" />
+		<img src="/assets/images/bg_custom4.jpg" data-bg-url="/assets/images/bg_custom4.jpg" alt="배경4" />
+		<img src="/assets/images/bg_custom5.jpg" data-bg-url="/assets/images/bg_custom5.jpg" alt="배경5" />
+      </div>
+    </div>
+    <div class="setting-option">
+      <h4>글자 크기</h4>
+      <div class="font-size-buttons">
+        <button data-font-size="0.9rem">작게</button>
+        <button data-font-size="1.1rem">보통</button>
+        <button data-font-size="1.3rem">크게</button>
+      </div>
+    </div>
+    <button id="close-settings-button">닫기</button>
+  </div>
+
+  <script src="/assets/js/settings.js" defer></script>
+  <script src="/assets/js/chat.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+/* /assets/css/chat.css */
+
+/* -------------------- 채팅 컨테이너 및 관련 패딩 -------------------- */
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden; /* body 자체 스크롤 방지 */
+    /* 기타 배경 설정 등은 index.html의 style 태그로 옮김 */
+}
+
+.chat-container {
+  flex: 1; /* 남은 공간을 모두 차지 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 내용과 입력/메뉴 영역 분리 */
+  
+  /* 총 고정 높이만큼 하단 패딩을 줍니다. */
+  padding-bottom: var(--total-fixed-height); 
+  transition: padding-bottom 0.3s ease; /* 패딩 변경 시 부드럽게 */
+  background-color: transparent !important; /* 배경 투명 유지 */
+  height: 100vh; /* 뷰포트 전체 높이 */
+  box-sizing: border-box; /* 패딩이 높이에 포함되도록 */
+  position: relative; /* 자식 absolute/fixed 요소의 기준이 될 수 있도록 */
+}
+
+/* settings-panel이 열렸을 때 chat-container의 padding-bottom 조정 */
+body.settings-active .chat-container {
+  /* 설정 패널 높이(var(--settings-panel-height))만큼 추가 패딩 */
+  padding-bottom: calc(var(--settings-panel-height) + var(--input-area-height)); 
+}
+
+/* -------------------- 채팅 메시지 영역 (chat-box) -------------------- */
+#chat-box { /* id 선택자가 더 구체적이므로 #chat-box 사용 */
+  flex: 1; /* 남은 공간을 차지하며 스크롤 가능 */
+  overflow-y: auto; /* 내용이 넘치면 스크롤 바 생성 */
+  padding: 1rem;
+  font-size: var(--chat-font-size);
+  position: relative; /* z-index를 위해 */
+  z-index: 1; /* 다른 고정 요소보다 아래에 있도록 */
+  background-color: transparent !important; /* 배경 투명 유지 */
+  /* 중요: 스크롤이 자동으로 입력창 위에 멈추도록 설정 */
+  scroll-padding-bottom: var(--total-fixed-height); 
+  transition: scroll-padding-bottom 0.3s ease;
+}
+
+body.settings-active #chat-box {
+  scroll-padding-bottom: calc(var(--settings-panel-height) + var(--input-area-height));
+}
+
+/* 개별 메시지 스타일 */
+.message {
+  display: flex;
+  margin-bottom: 1rem;
+  align-items: flex-end; /* 메시지 버블과 아바타 하단 정렬 */
+  position: relative; /* 말풍선 삼각형 위치 기준 */
+}
+.message.user {
+  justify-content: flex-end; /* 사용자 메시지는 오른쪽 정렬 */
+}
+.message.bot {
+  justify-content: flex-start; /* 봇 메시지는 왼쪽 정렬 */
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-size: 0.95rem; /* var(--chat-font-size)를 따르도록 수정 예정 */
+  line-height: 1.4;
+  word-wrap: break-word; /* 긴 단어도 줄 바꿈 */
+  color: black; /* 텍스트 색상 기본값 */
+  position: relative; /* 말풍선 삼각형 위치 기준 */
+  z-index: 2; /* 말풍선 삼각형보다 위에 있도록 */
+}
+
+/* 사용자 메시지 스타일 */
+.message.user .bubble {
+  background: #dcf8c6; /* 사용자 메시지 배경색 */
+  border-radius: 15px 0 15px 15px; /* 사용자 메시지 모서리 둥글게 */
+  color: #333;
+}
+/* 사용자 메시지 말풍선 삼각형 */
+.message.user .bubble::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -8px; /* 말풍선 우측에 위치 */
+  width: 0;
+  height: 0;
+  border-left: 8px solid #dcf8c6; /* 말풍선 색상과 동일 */
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  z-index: 1; /* 버블 아래에 있도록 */
+}
+
+/* 봇 메시지 스타일 */
+.message.bot .bubble {
+  background: #eeeeee; /* 봇 메시지 배경색 */
+  border-radius: 0 15px 15px 15px; /* 봇 메시지 모서리 둥글게 */
+  color: #333;
+}
+/* 봇 메시지 말풍선 삼각형 */
+.message.bot .bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px; /* 말풍선 좌측에 위치 */
+  width: 0;
+  height: 0;
+  border-right: 8px solid #eeeeee; /* 말풍선 색상과 동일 */
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  z-index: 1; /* 버블 아래에 있도록 */
+}
+
+
+.avatar { /* 봇 메시지에 아바타가 있는 경우 */
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+  border-radius: 50%;
+  flex-shrink: 0; /* 아바타가 줄어들지 않도록 */
+}
+
+/* -------------------- 상품 카드 영역 (JS에서 동적으로 생성) -------------------- */
+.card-container { /* renderProductCards에서 생성하는 div.card-container */
+  display: flex;
+  flex-wrap: wrap; /* 카드가 넘치면 다음 줄로 */
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5); /* 카드 컨테이너 배경색 (반투명) */
+  border-radius: 10px;
+  max-width: 90%; /* 너무 넓어지지 않도록 */
+  margin-left: auto; /* 봇 메시지처럼 왼쪽 정렬 */
+  margin-right: auto;
+  align-self: flex-start; /* 봇 메시지처럼 정렬 */
+}
+
+.product-card {
+  background: white;
+  color: black;
+  padding: 10px;
+  border-radius: 8px;
+  min-width: 150px; /* 카드 최소 너비 */
+  flex: 1 1 auto; /* 유연하게 크기 조절 */
+  font-size: 0.85rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.product-card img {
+  max-width: 100px;
+  height: auto;
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+.product-card b {
+  margin-bottom: 3px;
+}
+.product-card span {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 3px;
+}
+.product-card a {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 5px 10px;
+  background-color: #90e0b4;
+  color: black;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+
+
+/* -------------------- 메시지 입력 영역 (input-area) -------------------- */
+.input-area {
+  position: fixed;
+  bottom: var(--bottom-nav-height); /* 하단 내비게이션 바 위로 올림 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  background: #000;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  z-index: 1000;
+  transition: bottom 0.3s ease-out, opacity 0.3s ease-out; /* 위치 및 투명도 변경 애니메이션 */
+  height: var(--input-area-height); /* 높이 고정 */
+  align-items: center; /* 내부 요소 세로 중앙 정렬 */
+}
+.input-area textarea {
+  flex: 1;
+  resize: none;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background: #333;
+  color: white;
+  height: 40px; /* 텍스트 에어리어 높이 고정 */
+}
+.input-area button {
+  margin-left: 0.5rem;
+  padding: 0 1rem;
+  background: #90e0b4;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  height: 40px; /* 버튼 높이 고정 */
+}
+
+/* -------------------- 하단 내비게이션 바 (오렌지색) -------------------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; /* 화면 하단에 고정 */
+  left: 0;
+  width: 100%;
+  height: var(--bottom-nav-height); /* 고정 높이 */
+  background: #fbbd72;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: center; /* 메뉴 아이템 중앙 정렬 */
+  align-items: center;
+  z-index: 1001; /* input-area보다 높게 */
+  transform: translateY(0); /* 기본적으로 화면에 보임 */
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* 슬라이드 및 투명도 애니메이션 */
+}
+
+/* bottom-nav가 숨겨질 때 */
+.bottom-nav.hide-nav {
+  transform: translateY(100%); /* 자신의 높이만큼 아래로 이동하여 숨김 */
+  opacity: 0;
+  pointer-events: none; /* 클릭 이벤트 방지 */
+}
+
+/* -------------------- 하단 메뉴 아이템 (홈, 공지, 상담, 설정) -------------------- */
+.menu-slider {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1rem;
+  overflow-x: auto; /* 내용이 넘치면 가로 스크롤 허용 */
+}
+.menu-item {
+  flex: 0 0 auto;
+  background: #fff;
+  color: #333;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
