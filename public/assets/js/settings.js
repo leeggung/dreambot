@@ -8,6 +8,18 @@ function setChatBackground(url) {
   document.body.style.backgroundRepeat = 'no-repeat';
   localStorage.setItem('chat_bg_image', url);
 }
+document.querySelectorAll('.bg-options img').forEach(img => {
+    img.addEventListener('click', (event) => {
+        const bgUrl = event.target.dataset.bgUrl;
+        if (bgUrl) {
+            setChatBackground(bgUrl);
+        }
+    });
+});
+const savedBgImage = localStorage.getItem('chat_bg_image');
+if (savedBgImage) {
+    setChatBackground(savedBgImage);
+}
 
 // 폰트 크기 설정 함수
 function setFontSize(size) {
@@ -33,6 +45,7 @@ function toggleSettings() {
   if (isShowing) {
     body.classList.add('settings-active'); // body에 클래스 추가하여 chat-container 패딩 조절
 
+
     // 설정 패널의 높이를 CSS 변수로 설정 (애니메이션 완료 후 정확한 높이를 얻기 위해 약간의 지연)
     // 이 높이는 chat-container의 padding-bottom에 영향을 줍니다.
     setTimeout(() => {
@@ -43,7 +56,7 @@ function toggleSettings() {
     }, 50); // 짧은 지연
 
     // 설정 패널이 열리면 하단 내비게이션 바와 입력창 숨기기
-    mainBottomNav.classList.add('hide-nav');
+  //  mainBottomNav.classList.add('hide-nav');
     inputArea.style.opacity = '0'; // 투명하게 만들고
     inputArea.style.pointerEvents = 'none'; // 클릭 이벤트 방지
     inputArea.style.bottom = `-${inputArea.offsetHeight}px`; // 화면 밖으로 이동

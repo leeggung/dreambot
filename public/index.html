@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>드림봇 메인</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       margin: 0;
@@ -54,23 +55,23 @@
       transform: scale(1.1);
     }
 
-    .cards {
-      display: flex;
+    .cards-container {
+      width: 100%;
+      padding: 1rem;
       overflow-x: auto;
+      display: flex;
+      gap: 16px;
       scroll-snap-type: x mandatory;
-      gap: 20px;
-      padding: 20px;
     }
 
     .card {
-      flex: 0 0 auto;
-      width: 200px;
+      flex: 0 0 200px;
       background: white;
       border-radius: 12px;
-      overflow: hidden;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
+      overflow: hidden;
       scroll-snap-align: start;
+      text-align: center;
     }
 
     .card img {
@@ -79,23 +80,26 @@
       object-fit: cover;
     }
 
+    .card h3 {
+      margin: 10px;
+      font-size: 1rem;
+    }
+
     @media (max-width: 500px) {
       .card {
-        width: 46%;
+        flex: 0 0 80%;
       }
     }
   </style>
 </head>
-
 <body>
 
   <div class="main-wrap">
     <img src="/assets/images/main.png" alt="메인" />
     <a href="chat.html">
-      <img class="consult-btn" src="/assets/images/qa.png" alt="상담 시작하기 버튼" />
+      <img class="consult-btn" src="/assets/images/counsel.png" alt="상담 시작하기 버튼" />
     </a>
 
-    <!-- 언어 선택 (z-index 상단 고정) -->
     <div class="language-select">
       <a href="/index.html" title="한국어">
         <img src="/assets/images/South-Korea.png" alt="KR" width="30">
@@ -111,39 +115,46 @@
       </a>
     </div>
   </div>
-  <div class="cards">
-    
+
+  <div class="cards-container">
+    <div class="card">
+      <a href="https://blog.naver.com/leehyku/223859216766" target="_blank">
+        <img src="assets/Thumbnail/membership.png" alt="회원가입" />
+        <h3>회원가입</h3>
+      </a>
+    </div>
+
     <div class="card">
       <a href="https://studio.youtube.com/video/EYnH873ooV4/edit" target="_blank">
-        <img src="maketing.png" alt="신나는 마케팅플랜 썸네일"/>
+        <img src="assets/Thumbnail/maketing.png" alt="신나는 마케팅플랜" />
         <h3>신나는 마케팅플랜</h3>
       </a>
     </div>
-    
+
     <div class="card">
       <a href="https://blog.naver.com/leehyku/223851029151" target="_blank">
-        <img src="https://postfiles.pstatic.net/MjAyNTA1MDJfMTkw/MDAxNzQ2MTU2NDMwNDI1.Sn_bikh6XG1hD9Yu-lr4aef5gY86RWt0RHaCloBTUewg._HxTbKRtZYUIn4Jey_GvPWT45lx7H-GPbEwktZYRSuog.PNG/SE-5ae25258-89ec-46d1-b7d0-153b9a664a04.png?type=w3840" alt="부업에서 본업까지 썸네일"/>
+        <img src="assets/Thumbnail/sideline.png" alt="부업에서 본업까지" />
         <h3>부업에서 본업까지</h3>
       </a>
     </div>
-    
+
     <div class="card">
       <a href="https://blog.naver.com/leehyku/223851031151" target="_blank">
-        <img src="https://postfiles.pstatic.net/MjAyNTA1MTVfMTE3/MDAxNzQ3MjkzMjk5MjM2.L0CfnKh8_xFS_xv33Rq2c14uUaDaKUxZXg4K6lGq-ecg.DbDxWRbA9_l9kenGBn-bgaCfbV5wExVnLwOIAAqCqbQg.PNG/%EC%9E%90%EC%A3%BC%ED%95%98%EB%8A%94_%EC%A7%88%EB%AC%B8%EA%B3%BC_%EB%8B%B5%EB%B3%80.png?type=w966" alt="자주하는 질문 썸네일"/>
+        <img src="assets/Thumbnail/faq.png" alt="자주하는 질문" />
         <h3>자주하는 질문</h3>
       </a>
     </div>
-    
+
     <div class="card">
-      <a href="https://ebook.atomy.com/ecatalog5.jsp?Dir=80" target="_blank">
-        <img src="https://ch.static.atomy.com/2025/05/14/e39e6830459c4832beb4b966583980c8.jpg" alt="카탈로그 보기 썸네일"/>
-        <h3>카탈로그 보기</h3>
+      <a href="https://ebook.atomy.com/ecatalog5.jsp?Dir=127" target="_blank">
+        <img src="https://ch.static.atomy.com/2025/01/17/4b2aa67af8a54a0c8984304d83687898.jpg" alt="회사소개서" />
+        <h3>회사소개서</h3>
       </a>
     </div>
-    
-	<div class="card">
+
+    <div class="card">
       <a href="https://ebook.atomy.com/ecatalog5.jsp?Dir=80" target="_blank">
-        <img src="https://ch.static.atomy.com/2025/05/14/e39e6830459c4832beb4b966583980c8.jpg" alt="카탈로그 보기 썸네일"/>
+        <img src="https://ch.static.atomy.com/2025/05/14/e39e6830459c4832beb4b966583980c8.jpg" alt="카탈로그 보기" />
         <h3>카탈로그 보기</h3>
       </a>
     </div>

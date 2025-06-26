@@ -1,398 +1,394 @@
-// /assets/js/chat.js
-
 // 전역 변수 선언
-let products = []; // 제품 카드를 위한 데이터
+let products = []; // 제품 리스트
+function matchQABusinessAnswer(userMsg, qaData) {
+    const lower = userMsg.toLowerCase();
+    for (const qa of qaData) {
+        if (qa.tag && qa.tag.some(tag => lower.includes(tag.toLowerCase()))) {
+            return qa.answer;
+        }
+        if (qa.question && lower.includes(qa.question.replace(/\?/g,"").toLowerCase())) {
+            return qa.answer;
+        }
+    }
+    return null;
+}
 
-// 비즈니스 카드 데이터
+// 비즈니스 카드 데이터 (원하는 만큼 확장 가능)
 const businessCards = [
     {
         title: "자주하는 질문",
         description: "애터미 관련 자주 묻는 질문을 확인해보세요.",
-        image: "/assets/images/faq.png", // 경로 수정
+        image: "/assets/Thumbnail/faq.png", // 경로 수정
         link: "https://blog.naver.com/leehyku/223851031151"
     },
     {
         title: "회원가입 안내",
         description: "애터미 회원가입 방법을 확인하세요.",
-        image: "/assets/images/회원가입.png", // 경로 수정
+        image: "/assets/Thumbnail/membership.png", // 경로 수정
         link: "https://blog.naver.com/leehyku/223859216766"
+    },
+	{
+        title: "계보도 보는 방법",
+        description: "계보도 보는 방법을 확인하세요.",
+        image: "/assets/Thumbnail/tree.png", // 경로 수정
+        link: "https://blog.naver.com/leehyku/223870972762"
+    },
+	{
+        title: "부업에서 본업까지",
+        description: "부업에서 본업까지 가는길.",
+        image: "/assets/Thumbnail/sideline.png", // 경로 수정
+        link: "https://blog.naver.com/leehyku/223851029151"
+    },
+	{
+        title: "마케팅,플랜",
+        description: "마케팅 플랜을 알아보세요.",
+        image: "/assets/Thumbnail/flan.png", // 경로 수정
+        link: "https://blog.naver.com/leehyku/223859216766"
+    },
+	{
+        title: "소개,마케팅",
+        description: "알면쉬워요. 한명의 소개부터 이어지는 마케팅.",
+        image: "/assets/Thumbnail/easy,png", // 경로 수정
+        link: "https://blog.naver.com/leehyku/223866693358"
+    },
+	{
+        title: "협력사,아자몰",
+        description: "협업사 쇼핑몰 아자몰.",
+        image: "/assets/Thumbnail/azamall.png", // 경로 수정
+        link: "https://atomyaza.co.kr"
+    },
+	{
+        title: "아자몰,PVUP제품",
+        description: "아자몰 PV UP 상품관",
+        image: "/assets/Thumbnail/azapvup.jpg", // 경로 수정
+        link: "https://atomyaza.co.kr/m/shop/plan.display.detail.php?pl_no=503&cate_id=2094"
+    },
+	{
+        title: "GLOBAL, AZA",
+        description: "글로벌 아자몰.",
+        image: "/assets/Thumbnail/gobalaza.png", // 경로 수정
+        link: "https://global.atomyaza.com/"
+    },
+	{
+        title: "변화,계획,구축",
+        description: "마트 체인지가 시작됩니다.",
+        image: "/assets/Thumbnail/change.png", // 경로 수정
+        link: "https://blog.naver.com/leehyku/223851010978"
+    },
+	{
+        title: "회사선택,재무구조",
+        description: "회사 선택의 방법",
+        image: "/assets/Thumbnail/Select_company.png", // 경로 수정
+        link: "https://blog.naver.com/leehyku/223851006454"
+    },
+	{
+        title: "회사소개,애터미회사연혁",
+        description: "애터미 회사소개",
+        image: "/assets/Thumbnail/company.jpg", // 경로 수정
+        link: "https://blog.naver.com/leehyku/223846206345"
     }
+	
 ];
 
-// 텍스트 정제 함수
-function sanitizeGeminiText(text) {
-    // Gemini가 HTML 태그를 직접 포함하여 보내는 경우, 이 함수에서 HTML 태그를 제거하지 않습니다.
-    // addMessage 호출 시 isHTML: true를 사용하여 HTML로 렌더링되도록 합니다.
-    return text.trim();
-}
-
-// HTML 특수 문자 이스케이프 함수 (isHTML이 false일 때 사용)
-function escapeHtml(text) {
-    if (typeof text !== 'string') {
-        text = String(text);
-    }
-    return text.replace(/[&<>"']/g, (m) => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    })[m]);
-}
-
-// 메시지를 채팅창에 추가하는 함수 (UI 업데이트)
+// 메시지 UI 함수
 function addMessage(role, text, isHTML = false) {
     const chatBox = document.getElementById("chat-box");
-    if (!chatBox) {
-        console.error("채팅 박스 요소를 찾을 수 없습니다.");
-        return;
-    }
+    if (!chatBox) return;
 
     const messageDiv = document.createElement("div");
     messageDiv.className = `message ${role}`;
 
-    // 봇 메시지일 경우에만 아바타 추가
+    // 아바타: 유저/봇 각각 다른 이미지 사용
+    const avatar = document.createElement('img');
+    avatar.className = "avatar";
     if (role === "bot") {
-        const avatar = document.createElement('img');
-        avatar.src = "/assets/images/dreami.png"; // 아바타 이미지 경로
-        avatar.className = 'avatar';
+        avatar.src = "/assets/images/dreami.png";
         avatar.alt = "드림이";
-        messageDiv.appendChild(avatar);
+    } else {
+        avatar.src = "/assets/images/user.png";
+        avatar.alt = "유저";
     }
+    messageDiv.appendChild(avatar);
 
     const bubbleDiv = document.createElement("div");
     bubbleDiv.className = "bubble";
-    bubbleDiv.innerHTML = isHTML ? text : escapeHtml(text); // HTML 여부에 따라 처리
+    bubbleDiv.innerHTML = isHTML ? text : escapeHtml(text);
 
     messageDiv.appendChild(bubbleDiv);
     chatBox.appendChild(messageDiv);
-    // 스크롤 하단으로 이동 (부드러운 스크롤 추가)
+
+    // 스크롤 아래로
     chatBox.scrollTo({
         top: chatBox.scrollHeight,
         behavior: 'smooth'
     });
+
 }
 
-// 제품 매칭 함수
-function matchProduct(userMsg, products) {
-  const lowered = userMsg.toLowerCase();
-  const matched = [];
-
-  const bannedKeywords = ["리플렛", "카탈로그", "쇼핑백", "포장"];
-
-  for (const p of products) {
-  const name = (p.제품명 || "").toLowerCase();
-  const tagsRaw = p.태그 || "";
-  const tags = Array.isArray(tagsRaw) ? tagsRaw.join(",") : tagsRaw;
-  const tagsLower = String(tags).toLowerCase();
-
-  if (bannedKeywords.some(b => lowered.includes(b) || name.includes(b) || tagsLower.includes(b))) continue;
-
-  if (lowered.includes(name)) {
-    matched.push(p);
-    continue;
-  }
-
-  const tagList = tagsLower.split(',').map(t => t.trim());
-  for (const tag of tagList) {
-    if (tag && lowered.includes(tag)) {
-      matched.push(p);
-      break;
-    }
-  }
+// HTML 이스케이프
+function escapeHtml(text) {
+    if (typeof text !== 'string') text = String(text);
+    return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-
-  return matched;
-}
-
-// 비즈니스 카드 매칭 함수
-function matchBusinessCards(userMsg, cards) {
-  const lower = userMsg.toLowerCase();
-  return cards.filter(c =>
-    (lower.includes("회원가입") && c.title.includes("회원가입")) ||
-    (lower.includes("질문") && c.title.includes("자주하는"))
-  );
-}
-
-// 의도 분석 함수
-function analyzeIntent(text) {
-  const safe = (text || "").toLowerCase();
-  const productKeywords = ["제품", "성분", "건강", "효과", "피부", "눈", "면역", "보습", "영양", "샴푸", "치약", "비타민", "헤모힘", "솔루션"];
-  const businessKeywords = ["회원가입", "가입", "수당", "구조", "혜택", "수입", "포인트", "직급", "마케팅", "사업", "후원", "수익"];
-
-  const matchedProduct = productKeywords.some(k => safe.includes(k));
-  const matchedBusiness = businessKeywords.some(k => safe.includes(k));
-
-  if (matchedBusiness) return "business";
-  if (matchedProduct) return "product";
-  return "general";
-}
-// 제품 카드 렌더링 함수
+// 제품카드 3개(최대) 가로출력
+// renderProductCards 함수 수정 예시
 function renderProductCards(matchedProducts) {
-    if (!Array.isArray(matchedProducts) || matchedProducts.length === 0) {
-        console.error("renderProductCards: 유효한 제품 배열이 아니거나 비어있음!", matchedProducts);
-        return;
-    }
+  if (!Array.isArray(matchedProducts) || matchedProducts.length === 0) return;
+  const top3 = matchedProducts.slice(0, 3);
 
-    const cardsHTML = matchedProducts.map(product => {
-        const imageUrl = product.썸네일 || '';
-        const productName = escapeHtml(product.제품명 || '상품명 없음');
-        const tags = escapeHtml(product.태그 || '');
-        const price = escapeHtml(product.가격 || '');
-        const pv = escapeHtml(product.pv || '');
-        const link = escapeHtml(product.링크 || '#');
+  const cardsHTML = top3.map(product => {
+    const imageUrl = product.썸네일 || '';
+    const productName = escapeHtml(product.제품명 || '상품명 없음');
+    const tags = escapeHtml(product.태그 || '');
+    const price = escapeHtml(product.가격 || '');
+    const pv = escapeHtml(product.pv || '');
+    const link = escapeHtml(product.링크 || '#');
 
-        return `
-            <div class="product-card">
-                <b>👁️ 제품 카드</b><br><br>
-                ${imageUrl ? `<img src="${imageUrl}" alt="${productName}">` : ''}<br>
-                <b>${productName}</b><br>
-                <span>${tags}</span><br>
-                <span>${price} / ${pv}</span><br>
-                <a href="${link}" target="_blank">상세 보기</a>
-            </div>
-        `;
-    }).join('');
+    return `
+      <div class="product-card">
+        ${imageUrl ? `<img src="${imageUrl}" alt="${productName}">` : ''}
+        <b>${productName}</b><br>
+        <span>${tags}</span><br>
+        <span class="pv-point">${price} / ${pv}</span><br>
+        <a href="${link}" target="_blank"><button class="view-button">상세 보기</button></a>
+      </div>
+    `;
+  }).join('');
 
-    addMessage("bot", `<div class="card-container">${cardsHTML}</div>`, true);
+  // 말풍선 대신 별도 래퍼로 바로 추가
+  const chatBox = document.getElementById("chat-box");
+  if (!chatBox) return;
+
+  // 메시지 요소 따로 만들어서 말풍선 없이 카드만 추가
+  const messageDiv = document.createElement("div");
+  messageDiv.className = "message bot product-cards-message";
+
+  // 아바타 대신 빈 공간으로
+  const avatar = document.createElement("div");
+  avatar.className = "avatar placeholder";
+  avatar.style.width = "36px"; // 아바타 자리 확보
+  messageDiv.appendChild(avatar);
+
+  // 카드만 담을 컨테이너 생성
+  const cardsWrapper = document.createElement("div");
+  cardsWrapper.className = "product-cards-wrapper";
+  cardsWrapper.innerHTML = cardsHTML;
+
+  messageDiv.appendChild(cardsWrapper);
+  chatBox.appendChild(messageDiv);
+
+  // 스크롤 아래로
+  chatBox.scrollTo({
+    top: chatBox.scrollHeight,
+    behavior: 'smooth'
+  });
 }
 
-// 비즈니스 카드 렌더링 함수
+
+// 비즈니스 카드
 function renderBusinessCards(cards) {
-    cards.forEach(card => {
-        addMessage("bot", `
-            <div style="border:1px solid #aaa; padding:10px; border-radius:10px; margin:10px 0; background:#f0f0f0; color:#333;">
-                <b>📌 ${escapeHtml(card.title)}</b><br><br>
-                <img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.title)}" style="width:100px;height:auto;margin-bottom:5px;"><br>
-                ${escapeHtml(card.description)}<br>
-                <a href="${escapeHtml(card.link)}" target="_blank" style="color:blue;">자세히 보기</a>
-            </div>
-        `, true);
+  if (!cards.length) return;
+
+  const card = cards[0]; // 첫 번째 카드만 선택
+
+  const cardHTML = `
+    <div class="business-card">
+      <b>📌 ${escapeHtml(card.title)}</b><br><br>
+      <img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.title)}"
+           style="width:100px; height:auto; display:block; margin: 0 auto 5px;"><br>
+      ${escapeHtml(card.description)}<br>
+      <a href="${escapeHtml(card.link)}" target="_blank" style="color:blue;">자세히 보기</a>
+    </div>
+  `;
+
+  const chatBox = document.getElementById("chat-box");
+  if (!chatBox) return;
+
+  // 말풍선 없이 카드만 바로 추가
+  const container = document.createElement("div");
+  container.className = "product-cards-wrapper";
+  container.innerHTML = cardHTML;
+
+  chatBox.appendChild(container);
+
+  chatBox.scrollTo({
+    top: chatBox.scrollHeight,
+    behavior: 'smooth'
+  });
+}
+
+  
+// 제품 매칭 함수 (명칭/태그 포함)
+function matchProduct(userMsg, products) {
+    const lowered = userMsg.toLowerCase();
+    const bannedKeywords = ["리플렛", "카탈로그", "쇼핑백", "포장"];
+    return products.filter(p => {
+        const name = (p.제품명 || "").toLowerCase();
+        const tagsRaw = p.태그 || "";
+        const tags = Array.isArray(tagsRaw) ? tagsRaw.join(",") : tagsRaw;
+        const tagsLower = String(tags).toLowerCase();
+        if (bannedKeywords.some(b => lowered.includes(b) || name.includes(b) || tagsLower.includes(b))) return false;
+        if (lowered.includes(name)) return true;
+        return tagsLower.split(',').some(tag => tag && lowered.includes(tag));
     });
 }
 
-// Gemini API 호출 로직
+// 비즈니스 카드 매칭
+function matchBusinessCards(userMsg, cards) {
+    const lower = userMsg.toLowerCase();
+    return cards.filter(c =>
+      (lower.includes("회원가입") && c.title.includes("회원가입")) ||
+      (lower.includes("자주하는") && c.title.includes("질문")) ||
+      (lower.includes("재무구조") && c.title.includes("회사선택")) ||
+      (lower.includes("변화") && c.title.includes("계획")) ||
+      (lower.includes("아자몰") && c.title.includes("협력사")) ||
+      (lower.includes("계보도") && c.title.includes("보는")) ||
+      (lower.includes("부업") && c.title.includes("본업까지")) ||
+      (lower.includes("마케팅") && c.title.includes("플랜")) ||
+      (lower.includes("아자몰") && c.title.includes("pvup")) ||
+      (lower.includes("글로벌 아자") && c.title.includes("aza")) ||
+      (lower.includes("회사소개") && c.title.includes("회사")) || 
+      (lower.includes("혜택") && c.title.includes("비지니스"))  
+    );
+	}
+
+// 의도 분석
+function analyzeIntent(text) {
+    const safe = (text || "").toLowerCase();
+    const productKeywords = ["제품", "성분", "건강", "효과", "피부", "눈", "면역", "보습", "영양", "샴푸", "치약", "비타민", "헤모힘", "소개", "추천", "알려줘", "궁금"];
+    const businessKeywords = ["회원가입", "가입", "수당", "구조", "혜택", "수입", "포인트", "직급", "마케팅", "사업", "후원", "수익", "회사", "아자몰"];
+    if (businessKeywords.some(k => safe.includes(k))) return "business";
+    if (productKeywords.some(k => safe.includes(k))) return "product";
+    return "general";
+}
+
+// Gemini API 호출
 async function getGeminiResponse(userMessage) {
     try {
         const response = await fetch('/api/gemini', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ message: userMessage }),
         });
-
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Gemini API 서버 오류:', errorText);
             return `서버에서 오류가 발생했습니다: ${errorText}`;
         }
-
         const data = await response.json();
-        if (data && data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
+        if (data && data.candidates && data.candidates.length > 0 &&
+            data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
             return data.candidates[0].content.parts[0].text;
-        } else {
-            console.error("Gemini 응답 형식 오류:", data);
-            return "죄송합니다. 답변을 생성하지 못했습니다. (응답 형식 오류)";
         }
-
+        return "죄송합니다. 답변을 생성하지 못했습니다.";
     } catch (error) {
-        console.error('Gemini API 호출 중 오류 발생:', error);
         return `오류: AI 응답을 가져오는 데 실패했습니다. ${error.message}`;
     }
 }
 
-// === [추가된 필터링 로직 관련 상수 및 함수들] ===
-const bannedKeywords = ["쇼핑백", "포장", "리플렛", "사은품", "전단지", "꾸러미"];
-const requiredCategory = ["건강기능식품", "홍삼", "면역력", "눈 건강"];
-
-function cleanGPTText(text) {
-    // 이 함수는 현재 사용되지 않으며, sanitizeGeminiText가 역할을 대체합니다.
-    // HTML 이스케이프 또는 제거 로직이 필요한 경우 이 함수를 다시 활성화할 수 있습니다.
-    return text
-        .replace(/[\*\"\“\”]/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
+// Gemini 응답에서 3개만 제품카드
+function matchGeminiProducts(geminiText, products) {
+    const loweredGemini = (geminiText || "").toLowerCase();
+    return products.filter(p => {
+        const name = (p.제품명 || "").toLowerCase();
+        return loweredGemini.includes(name);
+    }).slice(0, 3);
 }
 
-function mentionsOtherBrands(text) {
-    const brands = ["암웨이", "뉴스킨", "시셀", "허벌라이프", "다단계", "경쟁사", "타회사"];
-    return brands.some(b => text.includes(b));
-}
-// === [필터링 로직 관련 끝] ===
-
-// 사용자 입력 처리 및 챗봇 응답 생성 핵심 함수
+// 사용자 입력 핵심 처리
 async function handleUserInput() {
     const userInput = document.getElementById("userInput");
-    if (!userInput) {
-        console.error("userInput 요소를 찾을 수 없습니다.");
-        return;
-    }
-
+    if (!userInput) return;
     const userMsg = userInput.value.trim();
     if (!userMsg) return;
+    addMessage("user", userMsg);
+    userInput.value = "";
 
-    addMessage("user", userMsg); // 사용자 메시지 UI에 추가
-    userInput.value = ""; // 입력 필드 초기화
+    // 비즈니스 카드 매칭/출력(최상단)
+    const businessMatches = matchBusinessCards(userMsg, businessCards);
+    if (businessMatches.length > 0) {
+        renderBusinessCards(businessMatches);
 
-    // --- 1. 클라이언트에서 먼저 의도를 분석하여 카드 렌더링 시도 ---
+        // QA 설명도 함께 출력
+        const matchedQAText = matchQABusinessAnswer(userMsg, qaData);
+        if (matchedQAText) {
+            addMessage("bot", matchedQAText, false);
+        return;
+	   }
+
+        // 카드와 QA 설명은 충분하니 여기서 종료
+    }
+
+    // 제품카드(3개까지) 매칭
     const intent = analyzeIntent(userMsg);
-    let cardRenderedByIntent = false; // 의도 분석에 의해 카드가 렌더링되었는지 여부
-
     if (intent === "product") {
         const matches = matchProduct(userMsg, products);
         if (matches.length > 0) {
-            renderProductCards(matches); // 여러 제품이 매치될 수 있으므로 한 번에 전달
-            cardRenderedByIntent = true;
-        }
-    } else if (intent === "business") {
-        const matches = matchBusinessCards(userMsg, businessCards);
-        if (matches.length > 0) {
-            renderBusinessCards(matches);
-            cardRenderedByIntent = true;
+            renderProductCards(matches);
         }
     }
 
-    // --- 2. Gemini API 호출 (카드 렌더링 여부와 관계없이 항상 호출) ---
-    // AI 답변 로딩 메시지 추가
-    addMessage("bot", "답변을 생성 중입니다...", false); // 로딩 메시지는 HTML이 아니므로 false
-
+    // Gemini API 호출
+    addMessage("bot", "답변을 생성 중입니다...", false);
     const geminiResponse = await getGeminiResponse(userMsg);
-    const sanitizedText = sanitizeGeminiText(geminiResponse);
+    const sanitizedText = (geminiResponse || "").trim();
 
-    // 로딩 메시지를 제거하고 실제 Gemini 응답으로 교체
+    // 이전 "답변을 생성 중입니다..." 제거
     const chatBox = document.getElementById("chat-box");
     if (chatBox && chatBox.lastChild) {
         const lastBubble = chatBox.lastChild.querySelector('.bubble');
         if (lastBubble && lastBubble.textContent === "답변을 생성 중입니다...") {
-            chatBox.lastChild.remove(); // 로딩 메시지 제거
+            chatBox.lastChild.remove();
         }
     }
-    
-    // Gemini 응답에 HTML 태그가 포함될 수 있으므로 isHTML을 true로 설정
-    // 이 방식은 Gemini가 의도치 않은 HTML을 생성할 경우 문제가 될 수 있습니다.
-    // 이상적으로는 Gemini에게 순수 텍스트만 요청하는 것이 좋습니다.
-    addMessage("bot", sanitizedText, true); 
 
-    // --- 3. Gemini 응답 후 추가 필터링 및 카드 렌더링 로직 ---
-    if (mentionsOtherBrands(sanitizedText)) {
-        addMessage("bot", "저는 애터미 전용 AI입니다. 애터미 관련 질문만 도와드릴 수 있어요.");
-    } else {
-        let matchesAfterGemini = products.filter(p => {
-            const name = p["제품명"] || "";
-            const category = p["카테고리"] || "";
+    addMessage("bot", sanitizedText, true);
 
-            // Gemini 응답 텍스트를 소문자로 변환하여 일치 여부 확인
-            const sanitizedTextLower = sanitizedText.toLowerCase();
-
-            const hasNameInResponse = sanitizedTextLower.includes(name.toLowerCase()); // 제품명 소문자 비교
-            const isCategoryValid = requiredCategory.some(rc => category.includes(rc));
-            const isExcluded = bannedKeywords.some(bk => name.includes(bk) || category.includes(bk));
-
-            return hasNameInResponse && isCategoryValid && !isExcluded;
-        });
-
-        if (intent === "product") {
-            matchesAfterGemini = matchProduct(sanitizedText, products);
-            if (matchesAfterGemini.length > 0) {
-                if (!cardRenderedByIntent) {
-                    setTimeout(() => {
-                        renderProductCards(matchesAfterGemini);
-                    }, 2000); // Gemini 응답 후 2초 지연
-                }
-            }
-        }
+    // Gemini 응답에서 제품 추천 카드 추출
+    const geminiMatches = matchGeminiProducts(sanitizedText, products);
+    if (geminiMatches.length > 0) {
+        renderProductCards(geminiMatches);
     }
-} // <== 여기가 handleUserInput 함수 닫는 중괄호!
-	
-		
-		
-// DOMContentLoaded 이벤트 리스너: 페이지 로드 후 실행
+}
+
+// ==== 초기화 ====
 window.addEventListener("DOMContentLoaded", () => {
-    // DOM 요소 참조 (이벤트 리스너 내에서 한 번만 가져옴)
-    const userInput = document.getElementById("userInput");
-    const sendButton = document.getElementById("send-button");
-    const settingsMenuItem = document.getElementById("settings-menu-item");
-    const closeSettingsButton = document.getElementById("close-settings-button");
-    // const chatContainer = document.querySelector(".chat-container"); // 더 이상 직접 사용하지 않음
-
     // products_tagged.json 로드
-    fetch("/products_tagged.json")
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.json();
-        })
-        .then(data => {
-            products = data; // 전역 products 변수에 할당
-            console.log("✅ products_tagged.json 로드 완료", products.length, "개 제품");
-        })
-        .catch(error => console.error("❌ products_tagged.json 로드 실패:", error));
+ 
+   fetch("/products_tagged.json")
+        .then(res => res.json())
+        .then(data => { products = data; });
+		
+		
+let qaLoaded = false;
 
-    // 1. 저장된 폰트 크기 불러오기 (settings.js의 함수 사용)
-    const savedFontSize = localStorage.getItem('chat_font_size');
-    if (savedFontSize) {
-      setFontSize(savedFontSize); // setFontSize 함수는 settings.js에 정의되어 있음
-    }
+fetch("/qa.json")
+  .then(res => res.json())
+  .then(data => {
+    qaData = data;
+    qaLoaded = true;
+  });
 
-    // 2. 저장된 배경 이미지 불러오기 (settings.js의 함수 사용)
-    const savedBgImage = localStorage.getItem('chat_bg_image');
-    if (savedBgImage) {
-      setChatBackground(savedBgImage); // setChatBackground 함수는 settings.js에 정의되어 있음
-    }
 
-    // 3. 입력창 포커스 시 채팅 컨테이너 패딩 조절 (모바일 키보드 대응)
-    // 이 부분은 chat.css의 scroll-padding-bottom으로 대체되므로 제거하거나 주석 처리합니다.
-    /*
-    if (userInput && chatContainer) {
-     
-      userInput.addEventListener("blur", () => {
-        chatContainer.classList.remove("raised");
-      });
-    }
-    */
-    // 입력창 포커스 시 스크롤 위치 조절은 CSS의 scroll-padding-bottom과 settings.js의 로직으로 처리됩니다.
-
-    // 4. 설정 메뉴 아이템 클릭 이벤트 연결 (settings.js의 toggleSettings 함수 사용)
-    if (settingsMenuItem) {
-        settingsMenuItem.addEventListener('click', toggleSettings);
-    }
-
-    // 5. 설정 패널 닫기 버튼 클릭 이벤트 연결
-    if (closeSettingsButton) {
-        closeSettingsButton.addEventListener('click', toggleSettings);
-    }
-    
-    // 6. 배경 이미지 선택 버튼 클릭 이벤트 연결 (settings.js의 setChatBackground 함수 사용)
-    document.querySelectorAll('.bg-options img').forEach(img => {
-        img.addEventListener('click', (event) => {
-            const bgUrl = event.target.dataset.bgUrl;
-            if (bgUrl) {
-                setChatBackground(bgUrl);
-            }
-        });
+    // 버튼/이벤트 연결
+    document.getElementById("send-button").addEventListener("click", handleUserInput);
+    document.getElementById("userInput").addEventListener("keydown", (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleUserInput();
+        }
     });
-
-    // 7. 폰트 크기 버튼 클릭 이벤트 연결 (settings.js의 setFontSize 함수 사용)
-    document.querySelectorAll('.font-size-buttons button').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const fontSize = event.target.dataset.fontSize;
-            if (fontSize) {
-                setFontSize(fontSize);
-            }
-        });
-    });
-
-    // 8. 전송 버튼 클릭 이벤트 연결
-    if (sendButton) {
-        sendButton.addEventListener("click", handleUserInput);
+    if (document.getElementById("settings-menu-item")) {
+        document.getElementById("settings-menu-item").addEventListener('click', toggleSettings);
     }
-
-    // 9. 엔터 키로 메시지 전송
-    if (userInput) {
-        userInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { // Shift+Enter는 줄 바꿈 허용
-                e.preventDefault(); // 기본 엔터 동작 (줄 바꿈) 방지
-                handleUserInput();
-			}
-        });
+    if (document.getElementById("close-settings-button")) {
+        document.getElementById("close-settings-button").addEventListener('click', toggleSettings);
     }
+    // 배경/폰트크기 등 settings.js 연동 (별도)
+});
+document.querySelectorAll('.font-size-buttons button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const size = btn.getAttribute('data-font-size');
+    setFontSize(size);
+  });
 });
