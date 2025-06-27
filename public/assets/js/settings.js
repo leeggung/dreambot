@@ -2,12 +2,21 @@
 
 // 채팅 배경 설정 함수
 function setChatBackground(url) {
-  document.body.style.backgroundImage = `url('${url}')`;
-  document.body.style.backgroundSize = 'cover';
-  document.body.style.backgroundPosition = 'center';
-  document.body.style.backgroundRepeat = 'no-repeat';
+  const container = document.querySelector('.chat-container');
+  if (!container) return;
+
+  // body 배경 제거
+  document.body.style.backgroundImage = 'none';
+
+  // chat-container에 배경 적용
+  container.style.backgroundImage = `url('${url}')`;
+  container.style.backgroundSize = 'cover';
+  container.style.backgroundPosition = 'center';
+  container.style.backgroundRepeat = 'no-repeat';
+
   localStorage.setItem('chat_bg_image', url);
 }
+
 document.querySelectorAll('.bg-options img').forEach(img => {
     img.addEventListener('click', (event) => {
         const bgUrl = event.target.dataset.bgUrl;
