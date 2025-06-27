@@ -5,15 +5,22 @@
   <title>드림봇 메인</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
+  
+    /* 기본 세팅 */
+    html, body {
       margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
       font-family: sans-serif;
-      background: #f4f4f4;
+      background: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
+    /* 메인 이미지 감싸는 프레임 */
     .main-wrap {
       position: relative;
       width: 100%;
@@ -21,47 +28,58 @@
       z-index: 1;
     }
 
-    .main-wrap img {
+    .main-wrap img.main-image {
       width: 100%;
       height: auto;
       display: block;
+      object-fit: cover;
     }
 
+    /* 상담하기 버튼 - 메인 이미지 내부에 absolute로 고정 */
     .consult-btn {
       position: absolute;
-      bottom: 20%;
-      right: 5%;
-      width: 160px;
+      bottom: 10%;
+      right: 37%;
+      width: 180px;
       max-width: 45%;
       cursor: pointer;
-    }
-
-    .language-select {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
       z-index: 10;
     }
 
-    .language-select img {
+    /* 국기 버튼들 - 메인 이미지 아래 위치, 독립적으로 배치 */
+    .language-select {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 0;
+      max-width: 720px;
+      width: 100%;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+
+    .language-select a img {
       cursor: pointer;
       border-radius: 5px;
+      width: 30px;
+      height: auto;
       transition: transform 0.2s ease;
     }
 
-    .language-select img:hover {
+    .language-select a img:hover {
       transform: scale(1.1);
     }
 
+    /* 카드 리스트 */
     .cards-container {
       width: 100%;
+      max-width: 720px;
       padding: 1rem;
       overflow-x: auto;
       display: flex;
       gap: 16px;
       scroll-snap-type: x mandatory;
+      box-sizing: border-box;
     }
 
     .card {
@@ -78,6 +96,8 @@
       width: 70%;
       height: 180px;
       object-fit: cover;
+      margin: 0 auto;
+      display: block;
     }
 
     .card h3 {
@@ -85,7 +105,7 @@
       font-size: 1rem;
     }
 
-    @media (max-width: 80px) {
+    @media (max-width: 480px) {
       .card {
         flex: 0 0 80%;
       }
@@ -94,28 +114,31 @@
 </head>
 <body>
 
+  <!-- 메인 이미지 및 상담 버튼 -->
   <div class="main-wrap">
-    <img src="/assets/images/main.png" alt="메인" />
+    <img src="/assets/images/main.png" alt="메인 이미지" class="main-image" />
     <a href="chat.html">
       <img class="consult-btn" src="/assets/images/counsel.png" alt="상담 시작하기 버튼" />
     </a>
-
-    <div class="language-select">
-      <a href="/index.html" title="한국어">
-        <img src="/assets/images/South-Korea.png" alt="KR" width="30">
-      </a>
-      <a href="lang/en/index.html" title="English">
-        <img src="/assets/images/United-States.png" alt="EN" width="30">
-      </a>
-      <a href="lang/zh/index.html" title="中文">
-        <img src="/assets/images/China.png" alt="CN" width="30">
-      </a>
-      <a href="lang/vn/index.html" title="Tiếng Việt">
-        <img src="/assets/images/Vietnam.png" alt="VN" width="30">
-      </a>
-    </div>
   </div>
 
+  <!-- 국기 버튼 영역 -->
+  <div class="language-select">
+    <a href="/index.html" title="한국어">
+      <img src="/assets/images/South-Korea.png" alt="KR" />
+    </a>
+    <a href="lang/en/index.html" title="English">
+      <img src="/assets/images/United-States.png" alt="EN" />
+    </a>
+    <a href="lang/zh/index.html" title="中文">
+      <img src="/assets/images/China.png" alt="CN" />
+    </a>
+    <a href="lang/vn/index.html" title="Tiếng Việt">
+      <img src="/assets/images/Vietnam.png" alt="VN" />
+    </a>
+  </div>
+
+  <!-- 카드 리스트 -->
   <div class="cards-container">
     <div class="card">
       <a href="https://blog.naver.com/leehyku/223859216766" target="_blank">
