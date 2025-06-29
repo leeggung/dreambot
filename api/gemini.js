@@ -36,22 +36,32 @@ export default async function handler(req, res) {
     const combinedPrompt = `
     ${atomyQaInstructions}
 
-    ---
-    애터미 회사 개요 및 철학:
-    ${companyPrompt}
-    ---
+---
+애터미 회사 개요 및 철학:
+${companyPrompt}
+---
 
+애터미 사업 Q&A 참조 데이터 (인터넷 최신 정보 우선):
+${formattedBusinessQaData}
+---
 
-    애터미 사업 Q&A 참조 데이터 (인터넷 최신 정보 우선):
-    ${formattedBusinessQaData}
-    ---
+애터미 쇼핑몰 참조 제품 목록:
+${formattedProductNames}
+---
 
-    애터미 쇼핑몰 참조 제품 목록:
-    ${formattedProductNames}
-    ---
+❗️ 반드시 다음 규칙을 지켜주세요:
+- 사용자가 한국어로 질문하면 한국어로, 영어면 영어로, 중국어면 중국어로 설명합니다.
+- **제품 이름(제품명)은 무조건 원래 한글 명칭으로 적으세요! 번역하지 마세요.**
+- 제품 설명은 사용자의 언어로, 제품 이름만 한국어로 유지!
+- 제품 리스트가 필요한 질문에는 반드시 [제품명(한글)] + (설명/효능은 사용자 언어) 형태로 출력하세요.
+- 예시:  
+  - Atomy 헤모힘 (60포, 1개월분): [사용자 언어로 효능설명]
+  - Atomy 바이탈 메가비타민C 2000: [사용자 언어로 효능설명]
+- 제품 이름(한글)이 답변에 꼭 들어가게 출력해야 함.  
+---
 
-    사용자 질문: ${userMessage}
-    `;
+사용자 질문: ${userMessage}
+`;
 
     const contents = [
       {
