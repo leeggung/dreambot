@@ -1,8 +1,14 @@
-// 전역 변수 선언
 let products = [];
 let qaData = [];
-let chatHistory = []; // 히스토리: 창 닫으면 자동 삭제
+let chatHistory = [];
 
+function normalize(str) {
+  return (str || "")
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[^\w가-힣]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '');
+}
 function highlightProductNames(text, products) {
     if (!Array.isArray(products) || products.length === 0) return text;
     let result = text;
@@ -21,7 +27,7 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-// 비즈니스 카드 데이터 (원하는 만큼 확장 가능)
+ // 비즈니스 카드 데이터 (원하는 만큼 확장 가능)
 const businessCards = [
     {
         title: "자주하는 질문",
@@ -98,7 +104,34 @@ const businessCards = [
 	
 ];
 
-// 메시지 UI 함수
+// 🟦 메시지 UI
+function showListeningState() {
+  addMessage("bot", "👂 드림이가 듣고 있어요...", false);
+  const botMessages = document.querySelectorAll(".message.bot .avatar");
+  if (botMessages.length > 0) {
+    botMessages[botMessages.length - 1].src = "/assets/images/dreami_listening.png";
+  }
+}
+function resetAvatarToDefault() {
+  const botMessages = document.querySelectorAll(".message.bot .avatar");
+  botMessages.forEach(img => {
+    img.src = "/assets/images/dreami.png";
+  });
+}
+function startListening() {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "ko-KR";
+  showListeningState();
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    document.getElementById("userInput").value = transcript;
+  };
+  recognition.onerror = function(e) {
+    alert("음성 인식 오류: " + e.error);
+    resetAvatarToDefault();
+  };
+  recognition.start();
+}
 function addMessage(role, text, isHTML = false) {
     chatHistory.push({ role, text });
     const chatBox = document.getElementById("chat-box");
@@ -118,12 +151,10 @@ function addMessage(role, text, isHTML = false) {
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
 
-// 제품카드 3개(최대) 가로출력
-// renderProductCards 함수 수정 예시
+// 🟦 제품카드 (3개까지)
 function renderProductCards(matchedProducts) {
   if (!Array.isArray(matchedProducts) || matchedProducts.length === 0) return;
   const top3 = matchedProducts.slice(0, 3);
-
   const cardsHTML = top3.map(product => {
     const imageUrl = product.썸네일 || '';
     const productName = escapeHtml(product.제품명 || '상품명 없음');
@@ -131,7 +162,6 @@ function renderProductCards(matchedProducts) {
     const price = escapeHtml(product.가격 || '');
     const pv = escapeHtml(product.pv || '');
     const link = escapeHtml(product.링크 || '#');
-
     return `
       <div class="product-card">
         ${imageUrl ? `<img src="${imageUrl}" alt="${productName}">` : ''}
@@ -142,43 +172,26 @@ function renderProductCards(matchedProducts) {
       </div>
     `;
   }).join('');
-
-  // 말풍선 대신 별도 래퍼로 바로 추가
   const chatBox = document.getElementById("chat-box");
   if (!chatBox) return;
-
-  // 메시지 요소 따로 만들어서 말풍선 없이 카드만 추가
   const messageDiv = document.createElement("div");
   messageDiv.className = "message bot product-cards-message";
-
-  // 아바타 대신 빈 공간으로
   const avatar = document.createElement("div");
   avatar.className = "avatar placeholder";
-  avatar.style.width = "36px"; // 아바타 자리 확보
+  avatar.style.width = "36px";
   messageDiv.appendChild(avatar);
-
-  // 카드만 담을 컨테이너 생성
   const cardsWrapper = document.createElement("div");
   cardsWrapper.className = "product-cards-wrapper";
   cardsWrapper.innerHTML = cardsHTML;
-
   messageDiv.appendChild(cardsWrapper);
   chatBox.appendChild(messageDiv);
-
-  // 스크롤 아래로
-  chatBox.scrollTo({
-    top: chatBox.scrollHeight,
-    behavior: 'smooth'
-  });
+  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
 
-
-// 비즈니스 카드
+// 🟦 비즈니스 카드
 function renderBusinessCards(cards) {
   if (!cards.length) return;
-
-  const card = cards[0]; // 첫 번째 카드만 선택
-
+  const card = cards[0];
   const cardHTML = `
     <div class="business-card">
       <b>📌 ${escapeHtml(card.title)}</b><br><br>
@@ -188,25 +201,16 @@ function renderBusinessCards(cards) {
       <a href="${escapeHtml(card.link)}" target="_blank" style="color:blue;">자세히 보기</a>
     </div>
   `;
-
   const chatBox = document.getElementById("chat-box");
   if (!chatBox) return;
-
-  // 말풍선 없이 카드만 바로 추가
   const container = document.createElement("div");
   container.className = "product-cards-wrapper";
   container.innerHTML = cardHTML;
-
   chatBox.appendChild(container);
-
-  chatBox.scrollTo({
-    top: chatBox.scrollHeight,
-    behavior: 'smooth'
-  });
+  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
 
-  
-// 제품 매칭 함수 (명칭/태그 포함)
+// 🟦 제품 매칭 함수
 function matchProduct(userMsg, products) {
     const lowered = userMsg.toLowerCase();
     const bannedKeywords = ["리플렛", "카탈로그", "쇼핑백", "포장"];
@@ -220,8 +224,7 @@ function matchProduct(userMsg, products) {
         return tagsLower.split(',').some(tag => tag && lowered.includes(tag));
     });
 }
-
-// 비즈니스 카드 매칭
+// 🟦 비즈니스 카드 매칭
 function matchBusinessCards(userMsg, cards) {
     const lower = userMsg.toLowerCase();
     return cards.filter(c =>
@@ -235,12 +238,11 @@ function matchBusinessCards(userMsg, cards) {
       (lower.includes("마케팅") && c.title.includes("플랜")) ||
       (lower.includes("아자몰") && c.title.includes("pvup")) ||
       (lower.includes("글로벌 아자") && c.title.includes("aza")) ||
-      (lower.includes("회사소개") && c.title.includes("회사소개")) || 
+      (lower.includes("회사소개") && c.title.includes("회사")) || 
       (lower.includes("혜택") && c.title.includes("비지니스"))  
     );
-	}
-
-// 의도 분석
+}
+// 🟦 의도 분석
 function analyzeIntent(text) {
     const safe = (text || "").toLowerCase();
     const productKeywords = ["제품", "성분", "건강", "효과", "피부", "눈", "면역", "보습", "영양", "샴푸", "치약", "비타민", "헤모힘", "소개", "추천", "알려줘", "궁금"];
@@ -250,7 +252,7 @@ function analyzeIntent(text) {
     return "general";
 }
 
-// Gemini API 호출
+// 🟦 Gemini API 호출
 async function getGeminiResponse(userMessage) {
     try {
         const response = await fetch('/api/gemini', {
@@ -273,7 +275,7 @@ async function getGeminiResponse(userMessage) {
     }
 }
 
-// Gemini 응답에서 3개만 제품카드
+// 🟦 Gemini 응답에서 3개만 제품카드
 function matchGeminiProducts(geminiText, products) {
     const loweredGemini = (geminiText || "").toLowerCase();
     return products.filter(p => {
@@ -282,7 +284,7 @@ function matchGeminiProducts(geminiText, products) {
     }).slice(0, 3);
 }
 
-// QA 답변 추출
+// 🟦 QA 답변 추출
 function matchQABusinessAnswer(userMsg, qaData) {
     const lower = userMsg.toLowerCase();
     for (const qa of qaData) {
@@ -296,51 +298,51 @@ function matchQABusinessAnswer(userMsg, qaData) {
     return null;
 }
 
-// ==== 진짜 핵심: 사용자 입력 처리 ==== (여기만 딱 1개!)
+// ==== 진짜 핵심: 사용자 입력 처리 ====
 async function handleUserInput() {
-    const userInput = document.getElementById("userInput");
-    if (!userInput) return;
-    const userMsg = userInput.value.trim();
-    if (!userMsg) return;
-    addMessage("user", userMsg);
-    userInput.value = "";
-
-    // 비즈니스 카드 먼저(질문이 해당하면 카드+QA, Gemini 설명 추가)
-    const businessMatches = matchBusinessCards(userMsg, businessCards);
-    if (businessMatches.length > 0) {
-        renderBusinessCards(businessMatches);
-        const matchedQAText = matchQABusinessAnswer(userMsg, qaData);
-        if (matchedQAText) addMessage("bot", matchedQAText, false);
-        // Gemini로 설명도 추가로 받음 (카드+QA+AI 설명 모두 나옴)
+  resetAvatarToDefault();
+  const userInput = document.getElementById("userInput");
+  if (!userInput) return;
+  const userMsg = userInput.value.trim();
+  if (!userMsg) return;
+  addMessage("user", userMsg);
+  userInput.value = "";
+  const isTranslateToZh = /중국어로 해줘|Chinese|中文/i.test(userInput);
+  const isTranslateToEn = /영어로 해줘|English|英文/i.test(userInput);
+  if (isTranslateToZh || isTranslateToEn) {
+    const lastBotMsg = [...chatHistory].reverse().find(msg => msg.role === "bot" && msg.text.length > 20);
+    if (lastBotMsg) {
+      const prompt = `${isTranslateToZh ? "아래 텍스트를 중국어로 자연스럽게 번역해줘:\n" : "Please translate the text below into English:\n"}${lastBotMsg.text}`;
+      const geminiResponse = await getGeminiResponse(prompt);
+      addMessage("bot", geminiResponse, true);
+      return;
     }
-
-    // Gemini 답변 호출 (제품/QA/일반 모두 이 단계에서)
-    addMessage("bot", "답변을 생성 중입니다...", false);
-    const geminiResponse = await getGeminiResponse(userMsg);
-    let sanitizedText = (geminiResponse || "").trim();
-
-    // 전처리: 제품명 빨강, 줄바꿈
-    sanitizedText = highlightProductNames(sanitizedText, products);
-    sanitizedText = convertNewlinesToBr(sanitizedText);
-
-    // "답변을 생성 중입니다..." 제거
-    const chatBox = document.getElementById("chat-box");
-    if (chatBox && chatBox.lastChild) {
-        const lastBubble = chatBox.lastChild.querySelector('.bubble');
-        if (lastBubble && lastBubble.textContent === "답변을 생성 중입니다...") {
-            chatBox.lastChild.remove();
-        }
+  }
+  const businessMatches = matchBusinessCards(userMsg, businessCards);
+  if (businessMatches.length > 0) {
+    renderBusinessCards(businessMatches);
+    const matchedQAText = matchQABusinessAnswer(userMsg, qaData);
+    if (matchedQAText) addMessage("bot", matchedQAText, false);
+  }
+  addMessage("bot", "답변을 생성 중입니다...", false);
+  const geminiResponse = await getGeminiResponse(userMsg);
+  let sanitizedText = (geminiResponse || "").trim();
+  sanitizedText = highlightProductNames(sanitizedText, products);
+  sanitizedText = convertNewlinesToBr(sanitizedText);
+  const chatBox = document.getElementById("chat-box");
+  if (chatBox && chatBox.lastChild) {
+    const lastBubble = chatBox.lastChild.querySelector('.bubble');
+    if (lastBubble && lastBubble.textContent === "답변을 생성 중입니다...") {
+      chatBox.lastChild.remove();
     }
-    addMessage("bot", sanitizedText, true);
-
-    // 제품추천: Gemini 응답에서 제품명 뽑아 3개까지 카드
-    const intent = analyzeIntent(userMsg);
-    if (intent === "product") {
-        const geminiMatches = matchGeminiProducts(sanitizedText, products);
-        if (geminiMatches.length > 0) renderProductCards(geminiMatches);
-    }
+  }
+  addMessage("bot", sanitizedText, true);
+  const intent = analyzeIntent(userMsg);
+  if (intent === "product") {
+    const geminiMatches = matchGeminiProducts(sanitizedText, products);
+    if (geminiMatches.length > 0) renderProductCards(geminiMatches);
+  }
 }
-
 
 // ==== 초기화 ====
 window.addEventListener("DOMContentLoaded", () => {
@@ -350,7 +352,6 @@ window.addEventListener("DOMContentLoaded", () => {
     fetch("/qa.json")
         .then(res => res.json())
         .then(data => { qaData = data; });
-
     document.getElementById("send-button").addEventListener("click", handleUserInput);
     document.getElementById("userInput").addEventListener("keydown", (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
